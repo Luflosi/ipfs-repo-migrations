@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"time"
 
 	"github.com/ipfs/go-ipfs/repo/fsrepo/migrations"
 )
@@ -126,26 +125,7 @@ func main() {
 }
 
 func latestRepoMigration(fetcher migrations.Fetcher) (int, error) {
-	// TODO: Remove currentVersion and get list of all fs-repo-*-to-* in one
-	// request and calculate latest
-	//
-	// When searching for latest migration, start looking using this repo version
-	const currentVersion = 11
+	const latestMigration = 12
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
-	defer cancel()
-
-	var latestMigration int
-	var err error
-	for i := currentVersion; err == nil; i++ {
-		dist := fmt.Sprintf("fs-repo-%d-to-%d", i-1, i)
-		_, err = migrations.LatestDistVersion(ctx, fetcher, dist, false)
-		if err == nil {
-			latestMigration = i
-		}
-	}
-	if latestMigration == 0 {
-		return 0, fmt.Errorf("Could not get available repo migrations: %s", err)
-	}
 	return latestMigration, nil
 }
